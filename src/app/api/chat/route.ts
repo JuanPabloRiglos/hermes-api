@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getChatCompletion, generateEmbedding } from '@/lib/openai';
 
+// Agregar interfaces
+interface ConversationHistoryItem {
+  user_message: string;
+  bot_response: string;
+  created_at: string;
+}
+
+interface RelevantContentItem {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  similarity: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 1. Obtener datos del request
@@ -12,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Buscar historial de conversación si existe conversationId
-    let conversationHistory = [];
+    let conversationHistory: ConversationHistoryItem[] = [];
     if (conversationId) {
       const { data: history } = await supabase
         .from('conversations')
@@ -43,15 +58,15 @@ export async function POST(request: NextRequest) {
 
     // 4. Crear contexto con historial + contenido relevante
     const knowledgeContext =
-      relevantContent
-        ?.map((doc: any) => `${doc.title}: ${doc.content}`)
+      (relevantContent as RelevantContentItem[])
+        ?.map((doc) => `${doc.title}: ${doc.content}`)
         .join('\n\n') || 'No hay información específica disponible.';
 
     const historyContext =
       conversationHistory.length > 0
         ? conversationHistory
             .map(
-              (msg: any) =>
+              (msg) =>
                 `Usuario: ${msg.user_message}\nAsistente: ${msg.bot_response}`
             )
             .join('\n\n')

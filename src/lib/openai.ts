@@ -22,7 +22,7 @@ export async function getChatCompletion(
   conversationHistory?: string
 ): Promise<string> {
   // Construir mensajes para OpenAI
-  const messages: any[] = [
+  const messages: Array<{ role: 'system' | 'user'; content: string }> = [
     {
       role: 'system',
       content: `Te llamas Hermi, eres un asistente comercial experto de Hermes, una startup argentina de desarrollo web especializada en tecnologías modernas e IA.
