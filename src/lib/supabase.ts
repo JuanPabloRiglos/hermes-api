@@ -17,7 +17,7 @@ export interface KnowledgeBase {
   content: string;
   category: string;
   embedding?: number[];
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   created_at?: string;
 }
 
