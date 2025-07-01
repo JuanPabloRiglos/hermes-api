@@ -17,6 +17,21 @@ interface RelevantContentItem {
   similarity: number;
 }
 
+// Configurar CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Manejar preflight requests (OPTIONS)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 1. Obtener datos del request
@@ -97,11 +112,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 8. Retornar respuesta con conversationId
-    return NextResponse.json({
-      response: botResponse,
-      conversationId: finalConversationId,
-      success: true,
-    });
+    return NextResponse.json(
+      {
+        response: botResponse,
+        conversationId: finalConversationId,
+        success: true,
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
     console.error('Error en /api/chat:', error);
     return NextResponse.json(
@@ -113,5 +131,8 @@ export async function POST(request: NextRequest) {
 
 // Test endpoint simple
 export async function GET() {
-  return NextResponse.json({ message: 'API funcionando!' });
+  return NextResponse.json(
+    { message: 'API funcionando!' },
+    { headers: corsHeaders }
+  );
 }
